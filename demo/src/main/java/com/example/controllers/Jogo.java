@@ -221,10 +221,11 @@ public class Jogo implements Initializable {
                         // mesma coluna (movimento horizontal pelo portal)
                 }
 
-                // Atualiza posição do jogador
+                // Salva a posição do jogador
                 posrecPlayerX = proxLinha;
                 posrecPlayerY = proxColuna;
 
+                // Atualiza posição do jogador
                 recPlayer.setLayoutX(posrecPlayerY * cellSize);
                 recPlayer.setLayoutY(posrecPlayerX * cellSize);
         }
@@ -249,6 +250,8 @@ public class Jogo implements Initializable {
                                         cell.setFill(Color.BLACK);
                                         cell.setStroke(Color.BLUE);
                                 } else if (mapa[y][x] == 4) {
+                                        // Adiciona o inimigo
+                                        // Define sua cor posição tamanho, coisas padrão
                                         recGhost = new Rectangle(cellSize, cellSize);
                                         recGhost.setId("recGhost");
                                         recGhost.setFill(Color.valueOf(ghost.getCor()));
@@ -282,12 +285,17 @@ public class Jogo implements Initializable {
         }
 
         public void setPlayer(Player pl) {
+                // "carrega" o player que foi criado pelo usuario, pegando o nome e a cor
+                // escolhida por ele e salva no objeto do player aqui
                 this.player.setNome(pl.getNome());
                 this.player.setCor(pl.getCor());
                 recPlayer.setFill(Color.valueOf(player.getCor()));
         }
 
         private void renderHud() {
+                // Adiciona a vida na tela, cada quadrado vermelho representa uma vida
+                // Salva cada vida em um Array para facilitar a manipulação das vidas caso o
+                // player leva algum dano
                 for (int i = 0; i < player.getLife(); i++) {
                         life = new Rectangle(cellSize, cellSize);
                         life.setId("life");
@@ -295,12 +303,14 @@ public class Jogo implements Initializable {
                         vidas[i] = life;
                         gmDisplay.getChildren().add(life);
                 }
+                // Adiciona a pontuação na tela
                 points = new Label("Pontuação: " + player.getPoints());
                 points.setStyle("-fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: white;");
                 gmDisplay.getChildren().add(points);
         }
 
         public void uptadePoints() {
+                // Atualiza a pontuação apenas
                 points.setText("Pontuação: " + player.getPoints());
         }
 

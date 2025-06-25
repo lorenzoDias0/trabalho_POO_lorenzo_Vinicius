@@ -16,7 +16,6 @@ import javafx.scene.shape.Rectangle;
 import java.io.IOException;
 
 import com.example.App;
-import com.example.entities.Ghost;
 import com.example.entities.Player;
 
 public class creatPlayer {
