@@ -1,3 +1,5 @@
+package com.example.controllers;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,18 +27,18 @@ public class AAsterisk {
         }
     }
 
-    public static class Details {
+    private static class Details {
         double value;
         int i, j;
 
-        public Details(double value, int i, int j) {
+        private Details(double value, int i, int j) {
             this.value = value;
             this.i = i;
             this.j = j;
         }
     }
 
-    public static class Cell {
+    private static class Cell {
         Pair parent;
         double f, g, h;
 
@@ -45,7 +47,7 @@ public class AAsterisk {
             f = g = h = -1;
         }
 
-        public Cell(Pair parent, double f, double g, double h) {
+        private Cell(Pair parent, double f, double g, double h) {
             this.parent = parent;
             this.f = f;
             this.g = g;
@@ -53,21 +55,22 @@ public class AAsterisk {
         }
     }
 
-    boolean isValid(int[][] grid, int rows, int cols, Pair point) {
+    private boolean isValid(int[][] grid, int rows, int cols, Pair point) {
         return (point.first >= 0 && point.first < rows && point.second >= 0 && point.second < cols);
     }
 
-    boolean isUnBlocked(int[][] grid, Pair point) {
-        return grid[point.first][point.second] == 1;
+    private boolean isUnBlocked(int[][] grid, Pair point) {
+        return grid[point.first][point.second] == 0 || grid[point.first][point.second] == 9
+                || grid[point.first][point.second] == 4 || grid[point.first][point.second] == 2;
     }
 
-    boolean isDestination(Pair position, Pair dest) {
+    private boolean isDestination(Pair position, Pair dest) {
         return position.equals(dest);
     }
 
-    double calculateHValue(Pair src, Pair dest) {
-        // Distância Euclidiana, pode trocar por Manhattan se preferir
-        return Math.sqrt(Math.pow((src.first - dest.first), 2.0) + Math.pow((src.second - dest.second), 2.0));
+    // Distância estimada entre src e dest usando a distância Manhattan
+    private double calculateHValue(Pair src, Pair dest) {
+        return Math.abs(src.first - dest.first) + Math.abs(src.second - dest.second);
     }
 
     // Função que retorna o caminho completo do início até o destino
@@ -75,7 +78,8 @@ public class AAsterisk {
         int rows = grid.length;
         int cols = grid[0].length;
 
-        if (!isValid(grid, rows, cols, start) || !isValid(grid, rows, cols, dest) || !isUnBlocked(grid, start) || !isUnBlocked(grid, dest)) {
+        if (!isValid(grid, rows, cols, start) || !isValid(grid, rows, cols, dest) || !isUnBlocked(grid, start)
+                || !isUnBlocked(grid, dest)) {
             System.out.println("Origem ou destino inválidos!");
             return Collections.emptyList();
         }
@@ -109,12 +113,14 @@ public class AAsterisk {
 
             for (int addX = -1; addX <= 1; addX++) {
                 for (int addY = -1; addY <= 1; addY++) {
-                    if (addX == 0 && addY == 0) continue;
-                    if (addX != 0 && addY != 0) continue;
-            
+                    if (addX == 0 && addY == 0)
+                        continue;
+                    if (addX != 0 && addY != 0)
+                        continue;
+
                     int newX = i + addX;
                     int newY = j + addY;
-            
+
                     Pair neighbor = new Pair(newX, newY);
 
                     if (isValid(grid, rows, cols, neighbor) && isUnBlocked(grid, neighbor) && !closedList[newX][newY]) {
@@ -157,19 +163,19 @@ public class AAsterisk {
     // Exemplo rápido para testar
     public static void main(String[] args) {
         int[][] grid = {
-            {1,1,0,0,1,0,0,0},
-            {1,0,0,1,1,0,1,0},
-            {1,1,0,1,0,0,1,0},
-            {1,1,0,1,1,1,1,1},
-            {1,1,0,0,0,1,1,1},
-            {0,1,1,1,0,1,1,0},
-            {1,1,0,1,1,1,1,0},
-            {0,1,1,1,1,1,1,1}
+                { 0, 0, 0, 0, 1, 0, 0, 0 },
+                { 0, 0, 0, 1, 1, 0, 1, 0 },
+                { 1, 1, 0, 1, 0, 0, 1, 0 },
+                { 1, 1, 0, 1, 0, 1, 1, 1 },
+                { 1, 1, 0, 0, 0, 1, 1, 1 },
+                { 0, 1, 1, 1, 0, 1, 1, 0 },
+                { 1, 1, 0, 1, 0, 0, 0, 0 },
+                { 0, 1, 1, 1, 1, 1, 1, 0 }
         };
 
         AAsterisk app = new AAsterisk();
-        Pair start = new Pair(0,0);
-        Pair dest = new Pair(6,6);
+        Pair start = new Pair(0, 0);
+        Pair dest = new Pair(6, 6);
 
         List<Pair> path = app.aStarPath(grid, start, dest);
 

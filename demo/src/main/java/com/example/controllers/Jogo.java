@@ -1,7 +1,9 @@
 package com.example.controllers;
 
+import java.util.List;
 import java.util.ResourceBundle;
 
+import com.example.controllers.AAsterisk.Pair;
 import com.example.entities.Ghost;
 import com.example.entities.Player;
 
@@ -26,6 +28,7 @@ import java.net.URL;
 public class Jogo implements Initializable {
         public Player player = new Player();
         public Ghost ghost = new Ghost("RED", 1);
+        AAsterisk aStar = new AAsterisk();
 
         private BooleanProperty wPressed = new SimpleBooleanProperty();
         private BooleanProperty aPressed = new SimpleBooleanProperty();
@@ -37,6 +40,10 @@ public class Jogo implements Initializable {
 
         private int posrecPlayerX = 1;
         private int posrecPlayerY = 1;
+
+        private int posrecInimigoX = 1;
+        private int posrecInimigoY = 1;
+
         private Rectangle[] vidas = new Rectangle[player.getLife()];
         private final int[][] mapa = {
                         { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
@@ -126,7 +133,18 @@ public class Jogo implements Initializable {
                                 moverecPlayer(0, 1);
                                 lastMoveTime = now;
                         }
+                        Pair start = new Pair(posrecInimigoX, posrecInimigoY);
+                        Pair dest = new Pair(posrecPlayerX, posrecPlayerY);
+                        List<Pair> path = aStar.aStarPath(mapa, start, dest);
+
+                        if (path.size() > 1) {
+                                Pair pos = path.get(1);
+                                uptadePosInimigo(pos);
+
+                        }
+                        lastMoveTime = now;
                 }
+
         };
 
         @Override
@@ -140,13 +158,9 @@ public class Jogo implements Initializable {
 
                 // caso alguma, qualquer tecla válida para o move seja presionada ou segurada,
                 // ele vai dar start no timer
-                keyPressed.addListener(((observableValue, aBoolean, t1) -> {
-                        if (!aBoolean) {
-                                timer.start();
-                        } else {
-                                timer.stop();
-                        }
-                }));
+                // Inicia o timer SEMPRE para o fantasma andar
+                timer.start();
+
                 Platform.runLater(() -> mainDisplay.requestFocus());
 
         }
@@ -258,6 +272,8 @@ public class Jogo implements Initializable {
                                         recGhost.setLayoutX(x * cellSize);
                                         recGhost.setLayoutY((y - 1) * cellSize);
                                         mainDisplay.getChildren().add(recGhost);
+                                        posrecInimigoX = y;
+                                        posrecInimigoY = x;
                                         recGhost.toFront();
                                 } else {
                                         // caso não for uma parede ent apenas pinta de branco esse retangulo (cell) e
@@ -309,9 +325,19 @@ public class Jogo implements Initializable {
                 gmDisplay.getChildren().add(points);
         }
 
-        public void uptadePoints() {
+        private void uptadePoints() {
                 // Atualiza a pontuação apenas
                 points.setText("Pontuação: " + player.getPoints());
+        }
+
+        private void uptadePosInimigo(Pair pos) {
+                posrecInimigoX = pos.first;
+                posrecInimigoY = pos.second;
+                recGhost.setLayoutX(posrecInimigoY * cellSize);
+                recGhost.setLayoutY(posrecInimigoX * cellSize);
+                System.out.println(posrecInimigoX);
+                System.out.println(posrecInimigoY);
+                recGhost.toFront();
         }
 
 }
