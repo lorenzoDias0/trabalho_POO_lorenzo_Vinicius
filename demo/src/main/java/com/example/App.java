@@ -2,8 +2,11 @@ package com.example;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -23,8 +26,26 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getVisualBounds();
+
+
+        double larguraJanela = 4;
+        double alturaJanela = 3;
+
+
+        while (larguraJanela + 4 <= bounds.getWidth() && alturaJanela + 3 <= bounds.getHeight()) {
+            larguraJanela += 4;
+            alturaJanela += 3;
+        }
+
+
+       
+        
         stageGlobal = stage;
-        scene = new Scene(loadFXML("creatPlayer"),Screen.getPrimary().getVisualBounds().getWidth(),Screen.getPrimary().getVisualBounds().getHeight());
+        scene = new Scene(loadFXML("creatPlayer"), larguraJanela, alturaJanela);
+
         stage.setY(0);
         stage.setX(0);
         stage.setScene(scene);
@@ -53,4 +74,5 @@ public class App extends Application {
         player = player1;
     }
 
+  
 }

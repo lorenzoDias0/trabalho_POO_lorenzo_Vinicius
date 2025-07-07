@@ -3,6 +3,7 @@ package com.example.controllers;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import com.example.App;
 import com.example.controllers.AAsterisk.Pair;
 import com.example.entities.Ghost;
 import com.example.entities.Player;
@@ -14,6 +15,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
@@ -21,6 +23,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Screen;
 import javafx.scene.control.Label;
 
 import java.net.URL;
@@ -36,7 +39,7 @@ public class Jogo implements Initializable {
         private BooleanProperty dPressed = new SimpleBooleanProperty();
 
         private BooleanBinding keyPressed = wPressed.or(aPressed).or(sPressed).or(dPressed);
-        private final int cellSize = 32;
+        private final int cellSize = calcCell();
 
         private int posrecPlayerX = 1;
         private int posrecPlayerY = 1;
@@ -339,5 +342,17 @@ public class Jogo implements Initializable {
                 System.out.println(posrecInimigoY);
                 recGhost.toFront();
         }
+
+          public static int calcCell(){
+        int cell = 1;
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getVisualBounds();
+
+        while ( 42 * (cell + 1) <= bounds.getWidth() && 32 *  (cell + 1) <= bounds.getHeight()) {
+           cell++;
+        }
+
+        return cell;
+    }
 
 }
