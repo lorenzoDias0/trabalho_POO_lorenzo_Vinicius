@@ -46,7 +46,7 @@ public class creatPlayer {
     @FXML
     public void initialize() {
         visualPlayer.setFill(Color.YELLOW);
-        cores.getItems().addAll("YELLOW", "BLUE", "GREEN");
+        cores.getItems().addAll("YELLOW", "BLUE", "GREEN","PURPLE","DeepPink","GRAY","RED","ORANGE","WHITE","WHEAT","BLACK");
         cores.setValue("YELLOW");
         cores.getSelectionModel().selectedItemProperty().addListener((obs, valorAntigo, novoValor) -> {
             if (novoValor != null) {

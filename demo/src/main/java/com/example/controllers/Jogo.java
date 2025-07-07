@@ -41,11 +41,16 @@ public class Jogo implements Initializable {
         private BooleanBinding keyPressed = wPressed.or(aPressed).or(sPressed).or(dPressed);
         private final int cellSize = calcCell();
 
+        private boolean colidiu = false;
+
         private int posrecPlayerX = 1;
         private int posrecPlayerY = 1;
 
         private int posrecInimigoX = 1;
         private int posrecInimigoY = 1;
+
+        private int posrecInimigoXInicial = 12;
+        private int posrecInimigoYInicial = 15;
 
         private Rectangle[] vidas = new Rectangle[player.getLife()];
         private final int[][] mapa = {
@@ -136,14 +141,12 @@ public class Jogo implements Initializable {
                                 moverecPlayer(0, 1);
                                 lastMoveTime = now;
                         }
-                        Pair start = new Pair(posrecInimigoX, posrecInimigoY);
-                        Pair dest = new Pair(posrecPlayerX, posrecPlayerY);
-                        List<Pair> path = aStar.aStarPath(mapa, start, dest);
-
-                        if (path.size() > 1) {
-                                Pair pos = path.get(1);
-                                uptadePosInimigo(pos);
-
+                        if (!colidiu) {
+                                calcPositionInimigo(posrecPlayerX, posrecPlayerY, 1);
+                        }else{
+                                if(posrecInimigoX == posrecInimigoXInicial && posrecInimigoY == posrecInimigoYInicial){
+                                        colidiu = false;
+                                }
                         }
                         lastMoveTime = now;
                 }
@@ -158,7 +161,11 @@ public class Jogo implements Initializable {
                 recPlayer.setLayoutY(posrecPlayerX * cellSize);
 
                 movementSetup();
-
+                if (verificarColisao(posrecPlayerX, posrecPlayerY, posrecInimigoX, posrecInimigoY) && !colidiu) {
+                        colidiu = true;
+                        diminuirVida();
+                        calcPositionInimigo(posrecInimigoXInicial, posrecInimigoYInicial, 2);
+                }
                 // caso alguma, qualquer tecla válida para o move seja presionada ou segurada,
                 // ele vai dar start no timer
                 // Inicia o timer SEMPRE para o fantasma andar
@@ -277,6 +284,7 @@ public class Jogo implements Initializable {
                                         mainDisplay.getChildren().add(recGhost);
                                         posrecInimigoX = y;
                                         posrecInimigoY = x;
+                                        System.out.println(x + " " + y);
                                         recGhost.toFront();
                                 } else {
                                         // caso não for uma parede ent apenas pinta de branco esse retangulo (cell) e
@@ -343,16 +351,44 @@ public class Jogo implements Initializable {
                 recGhost.toFront();
         }
 
-          public static int calcCell(){
-        int cell = 1;
-        Screen screen = Screen.getPrimary();
-        Rectangle2D bounds = screen.getVisualBounds();
+        private int calcCell() {
+                int cell = 1;
+                Screen screen = Screen.getPrimary();
+                Rectangle2D bounds = screen.getVisualBounds();
 
-        while ( 42 * (cell + 1) <= bounds.getWidth() && 32 *  (cell + 1) <= bounds.getHeight()) {
-           cell++;
+                while (42 * (cell + 1) <= bounds.getWidth() && 32 * (cell + 1) <= bounds.getHeight()) {
+                        cell++;
+                }
+
+                return cell;
         }
 
-        return cell;
-    }
+        private void diminuirVida() {
+                Rectangle[] aux = new Rectangle[vidas.length - 1];
+                for (int i = 0; i < vidas.length; i++) {
+                        aux[i] = vidas[i];
+                }
+                vidas = aux;
+                renderHud();
+        }
+
+        private boolean verificarColisao(int pX, int pY, int iX, int iY) {
+                if (pX == iX && pY == iY) {
+                        return true;
+                } else {
+                        return false;
+                }
+        }
+
+        private void calcPositionInimigo(int xx, int yy, int velo) {
+                Pair start = new Pair(posrecInimigoX, posrecInimigoY);
+                Pair dest = new Pair(xx, yy);
+                List<Pair> path = aStar.aStarPath(mapa, start, dest);
+
+                if (path.size() > 1) {
+                        Pair pos = path.get(velo);
+                        uptadePosInimigo(pos);
+                }
+        }
 
 }
