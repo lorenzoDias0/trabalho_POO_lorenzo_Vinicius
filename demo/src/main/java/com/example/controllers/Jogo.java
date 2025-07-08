@@ -13,6 +13,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
@@ -20,6 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Screen;
 import javafx.scene.control.Label;
 
 import java.net.URL;
@@ -34,7 +36,7 @@ public class Jogo implements Initializable {
         private BooleanProperty sPressed = new SimpleBooleanProperty();
         private BooleanProperty dPressed = new SimpleBooleanProperty();
 
-        private final int cellSize = 26;
+        private final int cellSize = calcResolucao();
 
         private int posrecPlayerX = 1;
         private int posrecPlayerY = 1;
@@ -42,10 +44,10 @@ public class Jogo implements Initializable {
         private int posrecInimigoX = 1;
         private int posrecInimigoY = 1;
 
-        private boolean stateFlee = false;
+        private boolean stateAgro = true;
 
-        private int posrecInimigoXInicial = 12;
-        private int posrecInimigoYInicial = 14;
+        private int posrecInimigoXInicial = 14;
+        private int posrecInimigoYInicial = 12;
 
         private Rectangle[] vidas = new Rectangle[player.getLife()];
         private final int[][] mapa = {
@@ -63,7 +65,7 @@ public class Jogo implements Initializable {
                         { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
                         { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 0, 0, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
                         { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 0, 0, 0, 0, 0, 0, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
-                        { 12, 2, 2, 2, 2, 2, 2, 2, 2, 2,1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 12},
+                        { 12, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0,0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 12 },
                         { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 0, 4, 0, 0, 0, 0, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
                         { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
                         { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
@@ -136,10 +138,16 @@ public class Jogo implements Initializable {
                                 moverecPlayer(0, 1);
                                 lastMoveTime = now;
                         }
-                        
-                        if (verificarColisao() && stateFlee) {
-                                calcInimigo(posrecInimigoXInicial, posrecInimigoYInicial, 2);
-                        }else{
+
+                        verificarColisao();
+
+                        if (!stateAgro) {
+                                calcInimigo(posrecInimigoXInicial,posrecInimigoYInicial, 2);
+                                if (verificarPosicao()) {
+                                        stateAgro = true;
+                                }
+
+                        } else {
                                 calcInimigo(posrecPlayerX, posrecPlayerY, 1);
                         }
 
@@ -346,19 +354,43 @@ public class Jogo implements Initializable {
                 Pair start = new Pair(posrecInimigoX, posrecInimigoY);
                 Pair dest = new Pair(xx, yy);
                 List<Pair> path = aStar.aStarPath(mapa, start, dest);
-
-                if (path.size() > 1) {
-                        Pair pos = path.get(velo);
-                        uptadePosInimigo(pos);
+                System.out.println(mapa[xx][yy]);
+                if (path.size() > 1 ) {
+                        if(velo < path.size() || velo == path.size() -1){
+                                Pair pos = path.get(velo);
+                                uptadePosInimigo(pos);
+                        }else{
+                                Pair pos = path.get(1);
+                                uptadePosInimigo(pos);
+                        }
+                       
 
                 }
         }
 
-        private boolean verificarColisao() {
+        private void verificarColisao() {
                 if (posrecInimigoX == posrecPlayerX && posrecInimigoY == posrecPlayerY) {
-                        stateFlee = true;
-                        return true;
+                        stateAgro = false;
+                }
+        }
 
+        private int calcResolucao() {
+                Screen screen = Screen.getPrimary();
+                Rectangle2D bounds = screen.getVisualBounds();
+
+                int cell = 1;
+
+                while ((cell + 1) * 42 <= bounds.getWidth() && (cell + 1) * 32 <= bounds.getHeight()) {
+                        cell++;
+                }
+                return cell;
+        }
+
+        private boolean verificarPosicao() {
+                System.out.println("----------"+posrecInimigoX+" "+posrecInimigoY+"-------"+posrecInimigoXInicial+" "+posrecInimigoYInicial);
+                if (posrecInimigoX == posrecInimigoXInicial && posrecInimigoY == posrecInimigoYInicial) {
+                        
+                        return true;
                 } else {
                         return false;
                 }

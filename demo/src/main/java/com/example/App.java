@@ -33,18 +33,10 @@ public class App extends Application {
 
         double larguraJanela = 4;
         double alturaJanela = 3;
-
-
-        while (larguraJanela + 4 <= bounds.getWidth() && alturaJanela + 3 <= bounds.getHeight()) {
-            larguraJanela += 4;
-            alturaJanela += 3;
-        }
-
-
        
-        
+
         stageGlobal = stage;
-        scene = new Scene(loadFXML("creatPlayer"), larguraJanela, alturaJanela);
+        scene = new Scene(loadFXML("creatPlayer"),  bounds.getWidth(),  bounds.getHeight());
 
         stage.setY(0);
         stage.setX(0);
