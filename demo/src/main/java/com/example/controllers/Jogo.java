@@ -25,6 +25,7 @@ import javafx.stage.Screen;
 import javafx.scene.control.Label;
 
 import java.net.URL;
+import java.util.ArrayList;
 
 public class Jogo implements Initializable {
         public Player player = new Player();
@@ -49,7 +50,8 @@ public class Jogo implements Initializable {
         private int posrecInimigoXInicial = 14;
         private int posrecInimigoYInicial = 12;
 
-        private Rectangle[] vidas = new Rectangle[player.getLife()];
+        private ArrayList<Rectangle> vidas = new ArrayList<>();
+
         private final int[][] mapa = {
                         { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
                         { 1, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 },
@@ -373,6 +375,7 @@ public class Jogo implements Initializable {
         private void verificarColisao() {
                 if (posrecInimigoX == posrecPlayerX && posrecInimigoY == posrecPlayerY) {
                         stateAgro = false;
+                        reduzirVida();
                 }
         }
 
@@ -394,5 +397,15 @@ public class Jogo implements Initializable {
                 } else {
                         return false;
                 }
+        }
+
+        private void reduzirVida(){
+                if(vidas.size() > 0){
+                        vidas.removeLast();
+                }
+                if(vidas.size() == 0){
+                        System.out.println("Morreu");
+                }
+                renderHud();
         }
 }
