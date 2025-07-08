@@ -159,33 +159,4 @@ public class AAsterisk {
         Collections.reverse(path);
         return path;
     }
-
-    // Exemplo rápido para testar
-    public static void main(String[] args) {
-        int[][] grid = {
-                { 0, 0, 0, 0, 1, 0, 0, 0 },
-                { 0, 0, 0, 1, 1, 0, 1, 0 },
-                { 1, 1, 0, 1, 0, 0, 1, 0 },
-                { 1, 1, 0, 1, 0, 1, 1, 1 },
-                { 1, 1, 0, 0, 0, 1, 1, 1 },
-                { 0, 1, 1, 1, 0, 1, 1, 0 },
-                { 1, 1, 0, 1, 0, 0, 0, 0 },
-                { 0, 1, 1, 1, 1, 1, 1, 0 }
-        };
-
-        AAsterisk app = new AAsterisk();
-        Pair start = new Pair(0, 0);
-        Pair dest = new Pair(6, 6);
-
-        List<Pair> path = app.aStarPath(grid, start, dest);
-
-        if (!path.isEmpty()) {
-            System.out.println("Caminho:");
-            for (Pair p : path) {
-                System.out.print("-> (" + p.first + "," + p.second + ") ");
-            }
-        } else {
-            System.out.println("Nenhum caminho encontrado.");
-        }
-    }
 }

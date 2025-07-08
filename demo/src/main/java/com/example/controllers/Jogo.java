@@ -9,7 +9,6 @@ import com.example.entities.Player;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
@@ -35,14 +34,18 @@ public class Jogo implements Initializable {
         private BooleanProperty sPressed = new SimpleBooleanProperty();
         private BooleanProperty dPressed = new SimpleBooleanProperty();
 
-        private BooleanBinding keyPressed = wPressed.or(aPressed).or(sPressed).or(dPressed);
-        private final int cellSize = 32;
+        private final int cellSize = 26;
 
         private int posrecPlayerX = 1;
         private int posrecPlayerY = 1;
 
         private int posrecInimigoX = 1;
         private int posrecInimigoY = 1;
+
+        private boolean stateFlee = false;
+
+        private int posrecInimigoXInicial = 12;
+        private int posrecInimigoYInicial = 14;
 
         private Rectangle[] vidas = new Rectangle[player.getLife()];
         private final int[][] mapa = {
@@ -58,10 +61,10 @@ public class Jogo implements Initializable {
                         { 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
                         { 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
                         { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
-                        { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 9, 9, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
-                        { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 9, 9, 9, 9, 9, 9, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
-                        { 12, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 9, 9, 9, 9, 9, 9, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 12 },
-                        { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 9, 4, 9, 9, 9, 9, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
+                        { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 0, 0, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
+                        { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 0, 0, 0, 0, 0, 0, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
+                        { 12, 2, 2, 2, 2, 2, 2, 2, 2, 2,1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 12},
+                        { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 0, 4, 0, 0, 0, 0, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
                         { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
                         { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
                         { 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
@@ -133,15 +136,13 @@ public class Jogo implements Initializable {
                                 moverecPlayer(0, 1);
                                 lastMoveTime = now;
                         }
-                        Pair start = new Pair(posrecInimigoX, posrecInimigoY);
-                        Pair dest = new Pair(posrecPlayerX, posrecPlayerY);
-                        List<Pair> path = aStar.aStarPath(mapa, start, dest);
-
-                        if (path.size() > 1) {
-                                Pair pos = path.get(1);
-                                uptadePosInimigo(pos);
-
+                        
+                        if (verificarColisao() && stateFlee) {
+                                calcInimigo(posrecInimigoXInicial, posrecInimigoYInicial, 2);
+                        }else{
+                                calcInimigo(posrecPlayerX, posrecPlayerY, 1);
                         }
+
                         lastMoveTime = now;
                 }
 
@@ -262,7 +263,7 @@ public class Jogo implements Initializable {
                                 if (mapa[y][x] == 1) {
                                         // definindo a cor da dessa parede (cell)
                                         cell.setFill(Color.BLACK);
-                                        cell.setStroke(Color.BLUE);
+                                        cell.setStroke(Color.SILVER);
                                 } else if (mapa[y][x] == 4) {
                                         // Adiciona o inimigo
                                         // Define sua cor posição tamanho, coisas padrão
@@ -274,6 +275,7 @@ public class Jogo implements Initializable {
                                         mainDisplay.getChildren().add(recGhost);
                                         posrecInimigoX = y;
                                         posrecInimigoY = x;
+                                        System.out.println(x + " " + y);
                                         recGhost.toFront();
                                 } else {
                                         // caso não for uma parede ent apenas pinta de branco esse retangulo (cell) e
@@ -340,4 +342,25 @@ public class Jogo implements Initializable {
                 recGhost.toFront();
         }
 
+        private void calcInimigo(int xx, int yy, int velo) {
+                Pair start = new Pair(posrecInimigoX, posrecInimigoY);
+                Pair dest = new Pair(xx, yy);
+                List<Pair> path = aStar.aStarPath(mapa, start, dest);
+
+                if (path.size() > 1) {
+                        Pair pos = path.get(velo);
+                        uptadePosInimigo(pos);
+
+                }
+        }
+
+        private boolean verificarColisao() {
+                if (posrecInimigoX == posrecPlayerX && posrecInimigoY == posrecPlayerY) {
+                        stateFlee = true;
+                        return true;
+
+                } else {
+                        return false;
+                }
+        }
 }
