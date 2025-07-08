@@ -30,11 +30,6 @@ public class App extends Application {
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
 
-
-        double larguraJanela = 4;
-        double alturaJanela = 3;
-       
-
         stageGlobal = stage;
         scene = new Scene(loadFXML("creatPlayer"),  bounds.getWidth(),  bounds.getHeight());
 

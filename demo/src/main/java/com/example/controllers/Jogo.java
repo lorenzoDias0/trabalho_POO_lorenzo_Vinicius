@@ -143,7 +143,9 @@ public class Jogo implements Initializable {
 
                         if (!stateAgro) {
                                 calcInimigo(posrecInimigoXInicial,posrecInimigoYInicial, 2);
+                                recGhost.setFill(Color.BROWN);
                                 if (verificarPosicao()) {
+                                        recGhost.setFill(Color.RED);
                                         stateAgro = true;
                                 }
 
@@ -271,7 +273,7 @@ public class Jogo implements Initializable {
                                 if (mapa[y][x] == 1) {
                                         // definindo a cor da dessa parede (cell)
                                         cell.setFill(Color.BLACK);
-                                        cell.setStroke(Color.SILVER);
+                                        cell.setStroke(Color.BLUE);
                                 } else if (mapa[y][x] == 4) {
                                         // Adiciona o inimigo
                                         // Define sua cor posição tamanho, coisas padrão
@@ -387,9 +389,7 @@ public class Jogo implements Initializable {
         }
 
         private boolean verificarPosicao() {
-                System.out.println("----------"+posrecInimigoX+" "+posrecInimigoY+"-------"+posrecInimigoXInicial+" "+posrecInimigoYInicial);
                 if (posrecInimigoX == posrecInimigoXInicial && posrecInimigoY == posrecInimigoYInicial) {
-                        
                         return true;
                 } else {
                         return false;
