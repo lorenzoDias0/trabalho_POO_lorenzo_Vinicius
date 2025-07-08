@@ -2,6 +2,7 @@ package com.example.controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -12,6 +13,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Screen;
 
 import java.io.IOException;
 
@@ -44,7 +46,7 @@ public class creatPlayer {
     @FXML
     public void initialize() {
         visualPlayer.setFill(Color.YELLOW);
-        cores.getItems().addAll("YELLOW", "BLUE", "GREEN");
+        cores.getItems().addAll("YELLOW", "BLUE", "GREEN","PURPLE","DeepPink","GRAY","RED","ORANGE","WHITE","WHEAT","BLACK");
         cores.setValue("YELLOW");
         cores.getSelectionModel().selectedItemProperty().addListener((obs, valorAntigo, novoValor) -> {
             if (novoValor != null) {
@@ -75,6 +77,8 @@ public class creatPlayer {
             Jogo gameController = loader.getController();
             gameController.setPlayer(player);
 
+           
+            
             App.stageGlobal.setScene(new Scene(root));
             App.stageGlobal.show();
         } catch (IOException e) {
@@ -82,4 +86,5 @@ public class creatPlayer {
         }
     }
 
+    
 }
